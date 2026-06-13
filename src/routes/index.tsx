@@ -86,11 +86,6 @@ const timeline = [
   { date: "Jun 9", text: "Anthropic ships native agent tool orchestration" },
 ];
 
-const missing = [
-  { icon: Zap, color: "text-amber-400", bg: "bg-amber-500/10", title: "POWER BOTTLENECK", body: "Utilities and grid infrastructure are the real constraints on AI growth, but receive <5% of investor attention.", why: "Secures long-term capacity for AI expansion." },
-  { icon: Wifi, color: "text-sky-400", bg: "bg-sky-500/10", title: "EDGE INFERENCE SHIFT", body: "Edge inference is accelerating faster than cloud in specific industries, but is largely overlooked by markets.", why: "Opens a new wave of hardware/software winners." },
-  { icon: UserSquare2, color: "text-violet-400", bg: "bg-violet-500/10", title: "AI TALENT GEOGRAPHY", body: "AI talent is rapidly decentralizing beyond SF/NY/Seattle, but relocation trends are under-tracked.", why: "Impacts future innovation hubs and cost structures." },
-];
 
 function Sparkline({ data, positive }: { data: { v: number }[]; positive: boolean }) {
   const color = positive ? "#22c55e" : "#ef4444";
@@ -294,30 +289,6 @@ function Index() {
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* What you're missing */}
-        <section className="rounded-lg border border-border bg-card p-5">
-          <div className="mb-4">
-            <span className="text-xs font-semibold tracking-widest text-muted-foreground">WHAT YOU'RE MISSING</span>
-            <span className="text-xs text-muted-foreground ml-2">(Underrepresented Insights)</span>
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            {missing.map(({ icon: Icon, color, bg, title, body, why }) => (
-              <div key={title} className="rounded-lg border border-border bg-background/40 p-4">
-                <div className="flex items-start gap-3">
-                  <div className={`size-10 rounded-full ${bg} flex items-center justify-center ${color}`}>
-                    <Icon className="size-5" />
-                  </div>
-                  <div>
-                    <div className={`text-sm font-semibold tracking-wide ${color}`}>{title}</div>
-                    <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{body}</p>
-                    <p className="mt-2 text-xs"><span className="text-violet-400 font-medium">Why it matters:</span> <span className="text-muted-foreground">{why}</span></p>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </section>
       </main>
