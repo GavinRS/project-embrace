@@ -51,8 +51,8 @@ export const Route = createFileRoute("/")({
 });
 
 const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, active: true },
-  { label: "Daily Brief", icon: FileText },
+  { label: "Dashboard", icon: LayoutDashboard, href: "/", active: true },
+  { label: "Daily Brief", icon: FileText, href: "/daily-brief" },
   { label: "Frontier AI Companies", icon: Building2 },
   { label: "Research Papers", icon: BookOpen },
   { label: "AI Insider", icon: Sparkles },
@@ -122,19 +122,29 @@ function Index() {
           </div>
         </div>
         <nav className="mt-2 flex-1 space-y-0.5 px-3">
-          {navItems.map(({ label, icon: Icon, active }) => (
-            <button
-              key={label}
-              className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                active
-                  ? "border border-violet-500/30 bg-violet-500/15 text-violet-200"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-              }`}
-            >
-              <Icon className="size-4" />
-              <span>{label}</span>
-            </button>
-          ))}
+          {navItems.map(({ label, icon: Icon, href, active }) => {
+            const className = `flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+              active
+                ? "border border-violet-500/30 bg-violet-500/15 text-violet-200"
+                : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+            }`;
+
+            if (href) {
+              return (
+                <a key={label} href={href} className={className}>
+                  <Icon className="size-4" />
+                  <span>{label}</span>
+                </a>
+              );
+            }
+
+            return (
+              <button key={label} className={className}>
+                <Icon className="size-4" />
+                <span>{label}</span>
+              </button>
+            );
+          })}
         </nav>
         <div className="flex items-center gap-2 px-5 py-4 text-xs text-muted-foreground">
           <span>Last updated {formatUpdatedAt(dashboard.updatedAt)}</span>
