@@ -132,6 +132,7 @@ function Sparkline({ data, positive }: { data: SparkPoint[]; positive: boolean }
 
 function Index() {
   const [activeView, setActiveView] = useState<"dashboard" | "daily-brief">("dashboard");
+  console.log("Index rendering, activeView:", activeView);
   const dashboard = Route.useLoaderData() as DashboardData;
   const { currentDate, signal, topStories, watchlist, stock, timeline } = dashboard;
   const stockPositive = stock.pct >= 0;
