@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DailyBriefRouteImport } from './routes/daily-brief'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -18,36 +17,26 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 
-const DailyBriefRoute = DailyBriefRouteImport.update({
-  id: '/daily-brief',
-  path: '/daily-brief',
-  getParentRoute: () => rootRouteImport,
-} as any)
-
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/daily-brief': typeof DailyBriefRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/daily-brief': typeof DailyBriefRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/daily-brief': typeof DailyBriefRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/daily-brief'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/daily-brief'
-  id: '__root__' | '/' | '/daily-brief'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DailyBriefRoute: typeof DailyBriefRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -59,19 +48,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/daily-brief': {
-      id: '/daily-brief'
-      path: '/daily-brief'
-      fullPath: '/daily-brief'
-      preLoaderRoute: typeof DailyBriefRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DailyBriefRoute: DailyBriefRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
