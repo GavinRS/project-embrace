@@ -192,11 +192,14 @@ function Index() {
       </aside>
 
       <main className="min-w-0 flex-1 space-y-6 px-8 py-6">
-        {activeView === "daily-brief" ? (
-          <DailyBriefPanel />
-        ) : (
-          <>
-            <div className="flex items-center justify-between gap-4">
+        {(() => {
+          console.log("conditional evaluating, activeView:", activeView);
+          if (activeView === "daily-brief") {
+            return <DailyBriefPanel />;
+          }
+          return (
+            <>
+              <div className="flex items-center justify-between gap-4">
               <div className="text-sm text-muted-foreground">{currentDate}</div>
               <div className="flex items-center gap-2">
                 <div className="relative">
