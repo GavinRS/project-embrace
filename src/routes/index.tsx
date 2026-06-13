@@ -24,6 +24,7 @@ import {
   Settings,
   Sparkles,
   TrendingUp,
+  type LucideIcon,
   Users,
   Video,
 } from "lucide-react";
@@ -51,7 +52,14 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const navItems = [
+type NavView = "dashboard" | "daily-brief";
+type NavItem = {
+  label: string;
+  icon: LucideIcon;
+  view?: NavView;
+};
+
+const navItems: NavItem[] = [
   { label: "Dashboard", icon: LayoutDashboard, view: "dashboard" },
   { label: "Daily Brief", icon: FileText, view: "daily-brief" },
   { label: "Frontier AI Companies", icon: Building2 },
@@ -65,7 +73,7 @@ const navItems = [
   { label: "Podcasts", icon: Mic },
   { label: "Conferences / Events", icon: Calendar },
   { label: "Geopolitics", icon: Globe2 },
-] as const;
+];
 
 const timeframes = ["1D", "1W", "1M", "3M", "6M", "YTD", "1Y", "2Y", "5Y", "ALL"];
 
