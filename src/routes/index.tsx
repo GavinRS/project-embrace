@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   Area,
   AreaChart,
@@ -131,10 +131,17 @@ function Index() {
 
             if (href) {
               return (
-                <Link key={label} to={href as "/" | "/daily-brief"} className={className}>
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => {
+                    window.location.href = href;
+                  }}
+                  className={className}
+                >
                   <Icon className="size-4" />
                   <span>{label}</span>
-                </Link>
+                </button>
               );
             }
 
