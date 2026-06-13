@@ -1,20 +1,49 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
-  LayoutDashboard, FileText, Building2, BookOpen, Sparkles, TrendingUp,
-  Users, Code2, Radio, Video, Mic, Calendar, Globe2, Search, Settings,
-  Plus, RefreshCw,
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  BookOpen,
+  Building2,
+  Calendar,
+  Code2,
+  FileText,
+  Globe2,
+  LayoutDashboard,
+  Mic,
+  Plus,
+  Radio,
+  RefreshCw,
+  Search,
+  Settings,
+  Sparkles,
+  TrendingUp,
+  Users,
+  Video,
 } from "lucide-react";
-import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+
 import { getDashboardSnapshot } from "../lib/api/dashboard.functions";
-import type { SparkPoint } from "../lib/dashboard-types";
+import type { DashboardData, SparkPoint } from "../lib/dashboard-types";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "AI Sherpa — Intelligence Dashboard" },
-      { name: "description", content: "Daily AI signals, market intelligence, and underrepresented insights for AI investors and operators." },
+      {
+        name: "description",
+        content:
+          "Daily AI signals, market intelligence, and underrepresented insights for AI investors and operators.",
+      },
       { property: "og:title", content: "AI Sherpa — Intelligence Dashboard" },
-      { property: "og:description", content: "Daily AI signals, market intelligence, and underrepresented insights." },
+      {
+        property: "og:description",
+        content: "Daily AI signals, market intelligence, and underrepresented insights.",
+      },
     ],
   }),
   loader: async () => getDashboardSnapshot(),
@@ -48,6 +77,7 @@ function formatUpdatedAt(value: string): string {
 
 function Sparkline({ data, positive }: { data: SparkPoint[]; positive: boolean }) {
   const color = positive ? "#22c55e" : "#ef4444";
+
   return (
     <ResponsiveContainer width="100%" height={32}>
       <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 2 }}>
@@ -57,39 +87,47 @@ function Sparkline({ data, positive }: { data: SparkPoint[]; positive: boolean }
             <stop offset="100%" stopColor={color} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <Area type="monotone" dataKey="v" stroke={color} strokeWidth={1.5} fill={`url(#sg-${color})`} isAnimationActive={false} />
+        <Area
+          type="monotone"
+          dataKey="v"
+          stroke={color}
+          strokeWidth={1.5}
+          fill={`url(#sg-${color})`}
+          isAnimationActive={false}
+        />
       </AreaChart>
     </ResponsiveContainer>
   );
 }
 
 function Index() {
-  const dashboard = Route.useLoaderData();
+  const dashboard = Route.useLoaderData() as DashboardData;
   const { currentDate, signal, topStories, watchlist, stock, timeline } = dashboard;
   const stockPositive = stock.pct >= 0;
   const stockAccent = stockPositive ? "text-emerald-400" : "text-red-400";
   const stockAccentMuted = stockPositive ? "text-emerald-400/70" : "text-red-400/70";
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
-      {/* Sidebar */}
-      <aside className="w-64 shrink-0 border-r border-border bg-card/40 flex flex-col">
-        <div className="px-5 py-5 flex items-center gap-3">
-          <div className="size-9 rounded-lg bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="size-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 20L12 4l8 16M7 14h10" /></svg>
+    <div className="flex min-h-screen bg-background text-foreground">
+      <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-card/40">
+        <div className="flex items-center gap-3 px-5 py-5">
+          <div className="flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-violet-700">
+            <svg viewBox="0 0 24 24" className="size-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M4 20L12 4l8 16M7 14h10" />
+            </svg>
           </div>
           <div>
             <div className="text-sm font-semibold tracking-wide">AI SHERPA</div>
-            <div className="text-[10px] text-muted-foreground tracking-widest">INTELLIGENCE DASHBOARD</div>
+            <div className="text-[10px] tracking-widest text-muted-foreground">INTELLIGENCE DASHBOARD</div>
           </div>
         </div>
-        <nav className="px-3 mt-2 flex-1 space-y-0.5">
+        <nav className="mt-2 flex-1 space-y-0.5 px-3">
           {navItems.map(({ label, icon: Icon, active }) => (
             <button
               key={label}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+              className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
                 active
-                  ? "bg-violet-500/15 text-violet-200 border border-violet-500/30"
+                  ? "border border-violet-500/30 bg-violet-500/15 text-violet-200"
                   : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
               }`}
             >
@@ -98,87 +136,81 @@ function Index() {
             </button>
           ))}
         </nav>
-        <div className="px-5 py-4 text-xs text-muted-foreground flex items-center gap-2">
+        <div className="flex items-center gap-2 px-5 py-4 text-xs text-muted-foreground">
           <span>Last updated {formatUpdatedAt(dashboard.updatedAt)}</span>
         </div>
       </aside>
 
-      {/* Main */}
-      <main className="flex-1 min-w-0 px-8 py-6 space-y-6">
-        {/* Header */}
+      <main className="min-w-0 flex-1 space-y-6 px-8 py-6">
         <div className="flex items-center justify-between gap-4">
           <div className="text-sm text-muted-foreground">{currentDate}</div>
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 placeholder="Search signals, tickers, themes..."
-                className="w-80 bg-card border border-border rounded-md pl-9 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                className="w-80 rounded-md border border-border bg-card py-2 pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
-            <button className="size-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground">
+            <button className="flex size-9 items-center justify-center rounded-md border border-border bg-card text-muted-foreground hover:text-foreground">
               <Settings className="size-4" />
             </button>
           </div>
         </div>
 
-        {/* Today's Signal */}
         <section>
           <div className="text-xs font-semibold tracking-widest text-violet-400">TODAY'S SIGNAL</div>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight">
-            {signal.title}
-          </h1>
-          <p className="mt-2 text-muted-foreground max-w-4xl">
-            {signal.body}
-          </p>
+          <h1 className="mt-2 text-4xl font-semibold tracking-tight">{signal.title}</h1>
+          <p className="mt-2 max-w-4xl text-muted-foreground">{signal.body}</p>
           <div className="mt-4 h-px bg-border" />
         </section>
 
-        {/* Top Stories */}
         <section>
-          <div className="text-xs font-semibold tracking-widest text-muted-foreground mb-3">TOP STORIES</div>
+          <div className="mb-3 text-xs font-semibold tracking-widest text-muted-foreground">TOP STORIES</div>
           <div className="grid grid-cols-5 gap-3">
-            {topStories.map((s) => (
+            {topStories.map((story) => (
               <a
-                key={s.url}
-                href={s.url}
+                key={story.url}
+                href={story.url}
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-violet-500/50 hover:bg-card/80"
               >
                 <div className="flex items-start gap-2">
-                  <div className="size-7 rounded-md bg-violet-500/20 text-violet-300 flex items-center justify-center text-sm font-semibold">{s.n}</div>
-                  <h3 className="text-sm font-semibold leading-snug">{s.title}</h3>
+                  <div className="flex size-7 items-center justify-center rounded-md bg-violet-500/20 text-sm font-semibold text-violet-300">
+                    {story.n}
+                  </div>
+                  <h3 className="text-sm font-semibold leading-snug">{story.title}</h3>
                 </div>
-                <div className="mt-3 text-xs text-violet-400">{s.source} · {s.ago}</div>
-                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{s.body}</p>
+                <div className="mt-3 text-xs text-violet-400">{story.source} · {story.ago}</div>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{story.body}</p>
               </a>
             ))}
           </div>
         </section>
 
-        {/* Watchlist + NVDA */}
         <section className="grid grid-cols-2 gap-4">
-          {/* Watchlist */}
           <div className="rounded-lg border border-border bg-card p-5">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <div className="text-xs font-semibold tracking-widest text-muted-foreground">WATCHLIST</div>
-              <button className="size-6 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground">
+              <button className="flex size-6 items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground">
                 <Plus className="size-3.5" />
               </button>
             </div>
             <ul className="divide-y divide-border/60">
-              {watchlist.map((w) => {
-                const pos = w.pct >= 0;
+              {watchlist.map((item) => {
+                const positive = item.pct >= 0;
                 return (
-                  <li key={w.sym} className="grid grid-cols-[1fr_120px_80px] items-center gap-4 py-3">
+                  <li key={item.sym} className="grid grid-cols-[1fr_120px_80px] items-center gap-4 py-3">
                     <div>
-                      <div className="text-sm font-semibold">{w.sym}</div>
-                      <div className="text-xs text-muted-foreground">{w.name}</div>
+                      <div className="text-sm font-semibold">{item.sym}</div>
+                      <div className="text-xs text-muted-foreground">{item.name}</div>
                     </div>
-                    <div className="h-8"><Sparkline data={w.data} positive={pos} /></div>
-                    <div className={`text-right text-sm font-medium ${pos ? "text-emerald-400" : "text-red-400"}`}>
-                      {pos ? "+" : ""}{w.pct.toFixed(2)}%
+                    <div className="h-8">
+                      <Sparkline data={item.data} positive={positive} />
+                    </div>
+                    <div className={`text-right text-sm font-medium ${positive ? "text-emerald-400" : "text-red-400"}`}>
+                      {positive ? "+" : ""}{item.pct.toFixed(2)}%
                     </div>
                   </li>
                 );
@@ -186,39 +218,38 @@ function Index() {
             </ul>
             <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
               <span>Yahoo Finance · updated {formatUpdatedAt(dashboard.updatedAt)}</span>
-              <button className="size-6 rounded-md border border-border flex items-center justify-center hover:text-foreground">
+              <button className="flex size-6 items-center justify-center rounded-md border border-border hover:text-foreground">
                 <RefreshCw className="size-3" />
               </button>
             </div>
           </div>
 
-          {/* NVIDIA */}
           <div className="rounded-lg border border-border bg-card p-5">
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold">{stock.name}</span>
                   <span className="text-xs text-muted-foreground">{stock.symbol}</span>
-                  <span className="text-[10px] uppercase tracking-wider bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded">{stock.sector}</span>
+                  <span className="rounded bg-violet-500/20 px-2 py-0.5 text-[10px] uppercase tracking-wider text-violet-300">
+                    {stock.sector}
+                  </span>
                 </div>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-3xl font-semibold">{stock.price.toFixed(2)}</span>
-                  <span className={`${stockAccent} text-sm font-medium`}>
-                    {stockPositive ? "+" : ""}{stock.pct.toFixed(2)}%
-                  </span>
-                  <span className={`${stockAccentMuted} text-sm`}>
-                    ({stockPositive ? "+" : ""}{stock.change.toFixed(2)})
-                  </span>
+                  <span className={`${stockAccent} text-sm font-medium`}>{stockPositive ? "+" : ""}{stock.pct.toFixed(2)}%</span>
+                  <span className={`${stockAccentMuted} text-sm`}>({stockPositive ? "+" : ""}{stock.change.toFixed(2)})</span>
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">{stock.marketState} · {stock.currency} · Yahoo Finance</div>
+                <div className="mt-1 text-xs text-muted-foreground">{stock.marketState} · {stock.currency} · Yahoo Finance</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-[1fr_140px] gap-6 mt-4">
+            <div className="mt-4 grid grid-cols-[1fr_140px] gap-6">
               <div>
-                <div className="flex gap-1 text-xs mb-2">
-                  {timeframes.map((t) => (
-                    <button key={t} className={`px-2 py-1 rounded ${t === "1D" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{t}</button>
+                <div className="mb-2 flex gap-1 text-xs">
+                  {timeframes.map((frame) => (
+                    <button key={frame} className={`rounded px-2 py-1 ${frame === "1D" ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                      {frame}
+                    </button>
                   ))}
                 </div>
                 <div className="h-48">
@@ -238,11 +269,11 @@ function Index() {
                   </ResponsiveContainer>
                 </div>
               </div>
-              <div className="space-y-2 text-xs pt-7">
-                {stock.stats.map(([k, v]) => (
-                  <div key={k} className="flex justify-between">
-                    <span className="text-muted-foreground">{k}</span>
-                    <span className="font-medium">{v}</span>
+              <div className="space-y-2 pt-7 text-xs">
+                {stock.stats.map(([label, value]) => (
+                  <div key={label} className="flex justify-between">
+                    <span className="text-muted-foreground">{label}</span>
+                    <span className="font-medium">{value}</span>
                   </div>
                 ))}
               </div>
@@ -250,17 +281,16 @@ function Index() {
           </div>
         </section>
 
-        {/* Timeline */}
         <section className="rounded-lg border border-border bg-card p-5">
-          <div className="text-xs font-semibold tracking-widest text-muted-foreground mb-6">AI TIMELINE (LAST 7 DAYS)</div>
+          <div className="mb-6 text-xs font-semibold tracking-widest text-muted-foreground">AI TIMELINE (LAST 7 DAYS)</div>
           <div className="relative">
             <div className="absolute left-0 right-0 top-3 h-px bg-violet-500/40" />
-            <div className="grid grid-cols-7 gap-2 relative">
-              {timeline.map((t) => (
-                <div key={t.date} className="flex flex-col items-center text-center">
-                  <div className="text-[10px] text-violet-400 mb-1">{t.date}</div>
-                  <div className="size-3 rounded-full bg-card border-2 border-violet-400 z-10" />
-                  <div className="mt-3 text-xs text-muted-foreground px-2 leading-snug">{t.text}</div>
+            <div className="relative grid grid-cols-7 gap-2">
+              {timeline.map((item) => (
+                <div key={`${item.date}-${item.text}`} className="flex flex-col items-center text-center">
+                  <div className="mb-1 text-[10px] text-violet-400">{item.date}</div>
+                  <div className="z-10 size-3 rounded-full border-2 border-violet-400 bg-card" />
+                  <div className="mt-3 px-2 text-xs leading-snug text-muted-foreground">{item.text}</div>
                 </div>
               ))}
             </div>
