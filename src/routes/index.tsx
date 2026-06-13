@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   LayoutDashboard, FileText, Building2, BookOpen, Sparkles, TrendingUp,
   Users, Code2, Radio, Video, Mic, Calendar, Globe2, Search, Settings,
-  Plus, RefreshCw, Zap, Wifi, UserSquare2,
+  Plus, RefreshCw,
 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 
