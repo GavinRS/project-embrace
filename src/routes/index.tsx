@@ -5,6 +5,8 @@ import {
   Plus, RefreshCw,
 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import { getDashboardSnapshot } from "../lib/api/dashboard.functions";
+import type { SparkPoint } from "../lib/dashboard-types";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -15,6 +17,7 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: "Daily AI signals, market intelligence, and underrepresented insights." },
     ],
   }),
+  loader: async () => getDashboardSnapshot(),
   component: Index,
 });
 
@@ -34,60 +37,16 @@ const navItems = [
   { label: "Geopolitics", icon: Globe2 },
 ];
 
-const topStories = [
-  { n: 1, title: "NVIDIA unveils sovereign AI infrastructure blueprint", ago: "1h ago", body: "New reference architecture aims to standardize national-scale AI deployments." },
-  { n: 2, title: "Anthropic ships Claude with native tool-use orchestration", ago: "2h ago", body: "Major step toward autonomous agents handling complex real-world workflows." },
-  { n: 3, title: "TSMC raises N2 wafer pricing 8% for 2026 commitments", ago: "3h ago", body: "Strong demand and tight capacity support continued pricing power into next year." },
-  { n: 4, title: "Meta releases Llama 4 tools for enterprise deployment", ago: "4h ago", body: "New tooling reduces friction for enterprise adoption of open-source models." },
-  { n: 5, title: "New mech-interpetability paper: features in Claude generalize to deception", ago: "6h ago", body: "Study shows models can generalize deceptive behavior in new environments." },
-];
-
-function spark(seed: number, trend: number): { v: number }[] {
-  const out: { v: number }[] = [];
-  let v = 50;
-  for (let i = 0; i < 24; i++) {
-    v += Math.sin((i + seed) * 0.9) * 3 + trend + (Math.cos((i + seed) * 1.7) * 2);
-    out.push({ v });
-  }
-  return out;
-}
-
-const watchlist = [
-  { sym: "NVDA", name: "NVIDIA Corp.", pct: 3.24, data: spark(1, 0.6) },
-  { sym: "TSM", name: "Taiwan Semi.", pct: 2.11, data: spark(2, 0.4) },
-  { sym: "MSFT", name: "Microsoft Corp.", pct: 0.88, data: spark(3, 0.2) },
-  { sym: "AMZN", name: "Amazon.com Inc.", pct: 0.67, data: spark(4, 0.15) },
-  { sym: "AVGO", name: "Broadcom Inc.", pct: 1.95, data: spark(5, 0.5) },
-  { sym: "PLTR", name: "Palantir Tech.", pct: -1.02, data: spark(6, -0.3) },
-  { sym: "CRWD", name: "CrowdStrike", pct: -0.53, data: spark(7, -0.15) },
-  { sym: "AI", name: "Global X AI ETF", pct: 4.12, data: spark(8, 0.75) },
-];
-
-const nvdaIntraday = Array.from({ length: 30 }, (_, i) => ({
-  t: `${10 + Math.floor(i / 5)}${i % 5 === 0 ? "AM" : ""}`,
-  v: 137.5 + Math.sin(i * 0.5) * 1.8 + i * 0.08 + Math.cos(i * 1.3) * 0.6,
-}));
-
-const nvdaStats: [string, string][] = [
-  ["Open", "138.26"], ["High", "141.38"], ["Low", "137.85"],
-  ["Volume", "265.4M"], ["Mkt Cap", "3.45T"], ["P/E", "55.21"],
-  ["52W High", "153.13"], ["52W Low", "86.62"], ["Avg Vol", "298.7M"], ["EPS (TTM)", "2.55"],
-];
-
 const timeframes = ["1D", "1W", "1M", "3M", "6M", "YTD", "1Y", "2Y", "5Y", "ALL"];
 
-const timeline = [
-  { date: "Jun 3", text: "NVIDIA expands sovereign AI partnerships" },
-  { date: "Jun 4", text: "OpenAI announces enterprise security upgrades" },
-  { date: "Jun 5", text: "AMD unveils next-gen AI accelerator roadmap" },
-  { date: "Jun 6", text: "Meta open-sources Llama 4 inference stack" },
-  { date: "Jun 7", text: "New reasoning model benchmark released" },
-  { date: "Jun 8", text: "TSMC confirms advanced packaging capacity boost" },
-  { date: "Jun 9", text: "Anthropic ships native agent tool orchestration" },
-];
+function formatUpdatedAt(value: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
 
-
-function Sparkline({ data, positive }: { data: { v: number }[]; positive: boolean }) {
+function Sparkline({ data, positive }: { data: SparkPoint[]; positive: boolean }) {
   const color = positive ? "#22c55e" : "#ef4444";
   return (
     <ResponsiveContainer width="100%" height={32}>
@@ -105,6 +64,12 @@ function Sparkline({ data, positive }: { data: { v: number }[]; positive: boolea
 }
 
 function Index() {
+  const dashboard = Route.useLoaderData();
+  const { currentDate, signal, topStories, watchlist, stock, timeline } = dashboard;
+  const stockPositive = stock.pct >= 0;
+  const stockAccent = stockPositive ? "text-emerald-400" : "text-red-400";
+  const stockAccentMuted = stockPositive ? "text-emerald-400/70" : "text-red-400/70";
+
   return (
     <div className="min-h-screen bg-background text-foreground flex">
       {/* Sidebar */}
@@ -134,7 +99,7 @@ function Index() {
           ))}
         </nav>
         <div className="px-5 py-4 text-xs text-muted-foreground flex items-center gap-2">
-          <span>Last updated 2 min ago</span>
+          <span>Last updated {formatUpdatedAt(dashboard.updatedAt)}</span>
         </div>
       </aside>
 
@@ -142,7 +107,7 @@ function Index() {
       <main className="flex-1 min-w-0 px-8 py-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between gap-4">
-          <div className="text-sm text-muted-foreground">Tuesday, June 9, 2026</div>
+          <div className="text-sm text-muted-foreground">{currentDate}</div>
           <div className="flex items-center gap-2">
             <div className="relative">
               <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -161,10 +126,10 @@ function Index() {
         <section>
           <div className="text-xs font-semibold tracking-widest text-violet-400">TODAY'S SIGNAL</div>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight">
-            Power infrastructure is becoming the primary bottleneck to AI expansion.
+            {signal.title}
           </h1>
           <p className="mt-2 text-muted-foreground max-w-4xl">
-            Surging data center buildouts are hitting power procurement and grid capacity limits, not compute constraints.
+            {signal.body}
           </p>
           <div className="mt-4 h-px bg-border" />
         </section>
@@ -174,14 +139,20 @@ function Index() {
           <div className="text-xs font-semibold tracking-widest text-muted-foreground mb-3">TOP STORIES</div>
           <div className="grid grid-cols-5 gap-3">
             {topStories.map((s) => (
-              <article key={s.n} className="rounded-lg border border-border bg-card p-4">
+              <a
+                key={s.url}
+                href={s.url}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-violet-500/50 hover:bg-card/80"
+              >
                 <div className="flex items-start gap-2">
                   <div className="size-7 rounded-md bg-violet-500/20 text-violet-300 flex items-center justify-center text-sm font-semibold">{s.n}</div>
                   <h3 className="text-sm font-semibold leading-snug">{s.title}</h3>
                 </div>
-                <div className="mt-3 text-xs text-violet-400">{s.ago}</div>
+                <div className="mt-3 text-xs text-violet-400">{s.source} · {s.ago}</div>
                 <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{s.body}</p>
-              </article>
+              </a>
             ))}
           </div>
         </section>
@@ -214,7 +185,7 @@ function Index() {
               })}
             </ul>
             <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-              <span>Last updated 2 min ago</span>
+              <span>Yahoo Finance · updated {formatUpdatedAt(dashboard.updatedAt)}</span>
               <button className="size-6 rounded-md border border-border flex items-center justify-center hover:text-foreground">
                 <RefreshCw className="size-3" />
               </button>
@@ -226,16 +197,20 @@ function Index() {
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold">NVIDIA Corp.</span>
-                  <span className="text-xs text-muted-foreground">NVDA</span>
-                  <span className="text-[10px] uppercase tracking-wider bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded">Semiconductors</span>
+                  <span className="text-sm font-semibold">{stock.name}</span>
+                  <span className="text-xs text-muted-foreground">{stock.symbol}</span>
+                  <span className="text-[10px] uppercase tracking-wider bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded">{stock.sector}</span>
                 </div>
                 <div className="mt-2 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold">140.72</span>
-                  <span className="text-emerald-400 text-sm font-medium">+3.24%</span>
-                  <span className="text-emerald-400/70 text-sm">(4.41)</span>
+                  <span className="text-3xl font-semibold">{stock.price.toFixed(2)}</span>
+                  <span className={`${stockAccent} text-sm font-medium`}>
+                    {stockPositive ? "+" : ""}{stock.pct.toFixed(2)}%
+                  </span>
+                  <span className={`${stockAccentMuted} text-sm`}>
+                    ({stockPositive ? "+" : ""}{stock.change.toFixed(2)})
+                  </span>
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">At close · USD</div>
+                <div className="text-xs text-muted-foreground mt-1">{stock.marketState} · {stock.currency} · Yahoo Finance</div>
               </div>
             </div>
 
@@ -248,7 +223,7 @@ function Index() {
                 </div>
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={nvdaIntraday} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+                    <AreaChart data={stock.chart} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                       <defs>
                         <linearGradient id="nvdaG" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#22c55e" stopOpacity={0.35} />
@@ -264,7 +239,7 @@ function Index() {
                 </div>
               </div>
               <div className="space-y-2 text-xs pt-7">
-                {nvdaStats.map(([k, v]) => (
+                {stock.stats.map(([k, v]) => (
                   <div key={k} className="flex justify-between">
                     <span className="text-muted-foreground">{k}</span>
                     <span className="font-medium">{v}</span>
